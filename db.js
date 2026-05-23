@@ -1,11 +1,15 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
+const isLocal = !process.env.DATABASE_URL || process.env.DATABASE_URL.includes('localhost');
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost')
-    ? { rejectUnauthorized: false }
-    : false,
+  ssl: isLocal ? false : { rejectUnauthorized: false },
+  // pgbouncer=true deshabilita prepared statements incompatibles con el pooler de Supabase
+  ...(process.env.DATABASE_URL?.includes('pooler.supabase.com') && {
+    max: 10,
+  }),
 });
 
 const q = (text, params) => pool.query(text, params);
