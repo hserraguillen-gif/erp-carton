@@ -1,4 +1,6 @@
 require('dotenv').config();
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
 const { Pool } = require('pg');
 
 const isLocal = !process.env.DATABASE_URL || process.env.DATABASE_URL.includes('localhost');
